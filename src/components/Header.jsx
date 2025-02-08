@@ -20,11 +20,11 @@ function Header() {
 
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
     }
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
   const scrollToTop = (e) => {
@@ -51,6 +51,7 @@ function Header() {
             </div>
           </div>
 
+          {/* Desktop Navigation Menu */}
           <div className="hidden md:block">
             <ul className="ml-10 flex items-baseline space-x-6">
               {navLinks.map((link) => (
@@ -79,17 +80,14 @@ function Header() {
           {/* Mobile Menu Button */}
           <div className="-mr-2 flex md:hidden">
             <button
-              onClick={(e) => {
-                e.stopPropagation(); // Prevents it from being blocked by the outside click handler
-                setIsOpen(!isOpen);
-              }}
+              onClick={() => setIsOpen((prev) => !prev)}
               type="button"
               className="bg-gray-900 inline-flex items-center justify-center p-2 rounded-md text-white hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
               aria-controls="mobile-menu"
               aria-expanded={isOpen}
             >
-              <span className="sr-only">Open main menu</span>
-              {!isOpen ? (
+              <span className="sr-only">Toggle main menu</span>
+              {isOpen ? (
                 <svg
                   className="block h-6 w-6"
                   xmlns="http://www.w3.org/2000/svg"
@@ -102,7 +100,7 @@ function Header() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
+                    d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
               ) : (
@@ -118,7 +116,7 @@ function Header() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
+                    d="M4 6h16M4 12h16M4 18h16"
                   />
                 </svg>
               )}

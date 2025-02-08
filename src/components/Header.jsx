@@ -79,7 +79,10 @@ function Header() {
           {/* Mobile Menu Button */}
           <div className="-mr-2 flex md:hidden">
             <button
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={(e) => {
+                e.stopPropagation(); // Prevents it from being blocked by the outside click handler
+                setIsOpen(!isOpen);
+              }}
               type="button"
               className="bg-gray-900 inline-flex items-center justify-center p-2 rounded-md text-white hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
               aria-controls="mobile-menu"

@@ -1,8 +1,9 @@
 import React from "react";
 
 function Header() {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const menuRef = React.useRef(null);
+  const buttonRef = React.useRef(null);
 
   const navLinks = [
     { name: "About Me", href: "#about" },
@@ -13,23 +14,33 @@ function Header() {
 
   React.useEffect(() => {
     const handleClickOutside = (event) => {
+      // Skip if clicking the menu button itself
+      if (buttonRef.current && buttonRef.current.contains(event.target)) {
+        return;
+      }
+
       if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsOpen(false);
+        setMenuOpen(false);
       }
     };
 
-    if (isOpen) {
+    // Only add the listener if the menu is open
+    if (menuOpen) {
       document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
     }
 
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuOpen]);
 
   const scrollToTop = (e) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleMenuClick = () => {
+    setMenuOpen(!menuOpen);
   };
 
   return (
@@ -80,53 +91,43 @@ function Header() {
           {/* Mobile Menu Button */}
           <div className="-mr-2 flex md:hidden">
             <button
-              onClick={() => setIsOpen((prev) => !prev)}
+              ref={buttonRef}
+              onClick={handleMenuClick}
               type="button"
               className="bg-gray-900 inline-flex items-center justify-center p-2 rounded-md text-white hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
               aria-controls="mobile-menu"
-              aria-expanded={isOpen}
+              aria-expanded={menuOpen}
             >
-              <span className="sr-only">Toggle main menu</span>
-              {isOpen ? (
-                <svg
-                  className="block h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="block h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              )}
+              <span className="sr-only">
+                {menuOpen ? "Close main menu" : "Open main menu"}
+              </span>
+              <div className="w-6 h-6 flex items-center justify-center">
+                {menuOpen ? (
+                  <span className="text-2xl leading-none">&times;</span>
+                ) : (
+                  <svg
+                    className="h-6 w-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  </svg>
+                )}
+              </div>
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Dropdown Menu */}
-      {isOpen && (
+      {menuOpen && (
         <div
           ref={menuRef}
           className="md:hidden bg-black absolute top-16 left-0 w-full"
@@ -138,7 +139,7 @@ function Header() {
                   href={link.href}
                   onClick={(e) => {
                     e.preventDefault();
-                    setIsOpen(false);
+                    setMenuOpen(false);
                     const section = document.querySelector(link.href);
                     if (section) {
                       section.scrollIntoView({
